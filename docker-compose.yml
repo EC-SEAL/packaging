@@ -1,0 +1,48 @@
+version: '3.3'
+
+services:
+  redis:
+      image: redis
+
+  # Dashboard app
+  dashboard:
+      # Dashboard image is also pulled from DockerHub
+      image: seal-packaging-dashboard:latest
+      command: uwsgi
+      ports:
+        - 8000
+      dns:
+        - 127.0.0.11
+      depends_on:
+        - redis
+      environment:
+        # Need because the code can work standalone
+        - USING_DOCKER=True
+        # Set to false when run in production
+        - DEBUG=True
+        - SEAL_ENDPOINT=<DASHBOARD_ENDPOINT_URL>
+        - USE_PROXY=False
+        - SEAL_PROXY_HTTP_ENDPOINT=<SEAL_PROXY_HTTP_URL>
+        - SEAL_PROXY_HTTPS_ENDPOINT=<SEAL_PROXY_HTTPS_URL>
+        - SEAL_SERVICE_URL=<SEAL_SERVICE_ENDPOINT_URL>
+        - DASHBOARD_PORT=8000
+        # We use redis as distributes key-value store
+        # Set to the machine where redis is running
+        - REDIS=redis
+
+  haproxy:
+      image: haproxy:2.0.20
+      # Won't start until the services are up and running.
+      depends_on:
+        - dashboard
+      dns:
+        - 127.0.0.11
+      volumes:
+        # If app services are running on the same port,
+        # the HAProxy can use the docker.sock to find the
+        # services that it should load balance.
+        #- /var/run/docker.sock:/var/run/docker.sock
+        - ./haproxy:/usr/local/etc/haproxy
+      ports:
+        - 80:80
+        - 443:443
