@@ -7,7 +7,7 @@ services:
   # Dashboard app
   dashboard:
       # Dashboard image is also pulled from DockerHub
-      image: seal-packaging-dashboard:latest
+      image: seal-dashboard-packaging:latest
       command: uwsgi
       ports:
         - 8000
