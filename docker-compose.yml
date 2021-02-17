@@ -20,10 +20,14 @@ services:
         - USING_DOCKER=True
         # Set to false when run in production
         - DEBUG=True
+        # Set for the dashboard endpoint SEAL URL access
         - SEAL_ENDPOINT=<DASHBOARD_ENDPOINT_URL>
+        # Set to true if a proxy is configured
         - USE_PROXY=False
+        # Proxy endpoints in case it is set up  
         - SEAL_PROXY_HTTP_ENDPOINT=<SEAL_PROXY_HTTP_URL>
         - SEAL_PROXY_HTTPS_ENDPOINT=<SEAL_PROXY_HTTPS_URL>
+        # Endpoint for SEAL microservices
         - SEAL_SERVICE_URL=<SEAL_SERVICE_ENDPOINT_URL>
         - DASHBOARD_PORT=8000
         # We use redis as distributes key-value store
