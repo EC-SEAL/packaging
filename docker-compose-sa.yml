@@ -7,10 +7,10 @@ services:
   # Dashboard app
   dashboard:
       # Dashboard image is also pulled from DockerHub
-      image: seal-dashboard-packaging:latest
-      command: uwsgi
+      image: albbasdur/seal-dashboard-packaging:latest
+      command: uwsgi-sa
       ports:
-        - 8000
+        - 443:443
       dns:
         - 127.0.0.11
       depends_on:
@@ -29,24 +29,14 @@ services:
         - SEAL_PROXY_HTTPS_ENDPOINT=<SEAL_PROXY_HTTPS_URL>
         # Endpoint for SEAL microservices
         - SEAL_SERVICE_URL=<SEAL_SERVICE_ENDPOINT_URL>
-        - DASHBOARD_PORT=8000
+        # Certificate key path mounted in certs directory
+        - KEY_PATH=certs/<CERTIFICATE_KEY>.key
+        # Certificate path mounted in certs directory
+        - CERT_PATH=certs/<CERTIFICATE>.crt
+        # Dashboard uWSGI port
+        - DASHBOARD_PORT=443
         # We use redis as distributes key-value store
         # Set to the machine where redis is running
         - REDIS=redis
-
-  haproxy:
-      image: haproxy:2.0.20
-      # Won't start until the services are up and running.
-      depends_on:
-        - dashboard
-      dns:
-        - 127.0.0.11
       volumes:
-        # If app services are running on the same port,
-        # the HAProxy can use the docker.sock to find the
-        # services that it should load balance.
-        #- /var/run/docker.sock:/var/run/docker.sock
-        - ./haproxy:/usr/local/etc/haproxy
-      ports:
-        - 80:80
-        - 443:443
+        - ./<PATH_TO_CERTIFICATE_AND_KEY_DIRECTORY>:/var/www/seal/certs
